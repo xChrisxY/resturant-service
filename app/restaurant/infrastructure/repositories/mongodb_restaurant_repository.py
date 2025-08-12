@@ -9,7 +9,17 @@ class MongoDBRestaurantRepository(RestaurantRepository):
         self.collection = database.restaurant
 
     async def create(self, restaurant: Restaurant) -> Restaurant:
-        pass 
+
+        restaurant_dict = restaurant.model_dump(by_alias=True, exclude={"id"})
+
+        result = await self.collection.insert_one(restaurant_dict)
+
+        created_restaurant = await self.collection.find_one({"_id": result.inserted_id})
+
+        if created_restaurant and "_id" in created_restaurant:
+            created_restaurant["_id"] = str(created_restaurant["_id"])
+            
+        return Restaurant(**created_restaurant)
     
     async def get_by_id(self, restaurant_id):
         return await super().get_by_id(restaurant_id)

@@ -25,7 +25,7 @@ class RestaurantController:
                     "street" : restaurant.address.street, 
                     "city" : restaurant.address.city, 
                     "state" : restaurant.address.state, 
-                    "county" : restaurant.address.country, 
+                    "country" : restaurant.address.country, 
                     "postal_code" : restaurant.address.postal_code, 
                     "additional_info" : restaurant.address.additional_info
                 },

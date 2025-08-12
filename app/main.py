@@ -5,6 +5,8 @@ from .config.settings import settings
 from .config.database import connect_to_mongo, close_mongo_connection
 import logging
 
+from .restaurant.infrastructure.routers.restaurant import router as restaurant_router
+
 logging.basicConfig(format="%(asctime)s | %(name)s | %(levelname)s | %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -46,6 +48,8 @@ async def health_check():
         "service" : settings.app_name,
         "version" : settings.version
     }
+
+app.include_router(restaurant_router)
 
 if __name__ == "__main__": 
     import uvicorn 

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 T = TypeVar('T')
 
 class SuccessResponse(BaseModel, Generic[T]):
-    success: bool 
+    success: bool = True
     data: T 
     message: str 
     status_code: int = 200 

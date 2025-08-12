@@ -1,5 +1,6 @@
 from typing import Optional, List
 from pydantic import BaseModel, Field, EmailStr, validator
+from ...domain.entities.enums import Status
 
 class CreateAddressDTO(BaseModel):
     street: str = Field(..., min_length=3, max_length=100, description="Calle y número")
@@ -30,13 +31,13 @@ class CreateRestaurantDTO(BaseModel):
     name: str = Field(..., min_length=3, max_length=50, description="Nombre del restaurante")
     description: Optional[str] = Field(default=None, description="Descripción breve del restaurante")
     owner_id: str = Field(..., description="ID del propietario del restaurante")
-    address: CreateAddressDTO
+    address: CreateAddressDTO = Field(..., description="Dirección del restaurante")
     phone_number: str = Field(..., description="Número telefónico del restaurante")
     email: EmailStr = Field(..., description="Correo electrónico del restaurante")
     menu_items: List[CreateMenuItemDTO] = Field(default=[], description="Lista de platillos del restaurante")
     opening_hours: str = Field(..., description="Horarios de apertura y cierre")
-    status: str = Field(default="open", description="Estado del restaurante: open, closed o suspended")
-    rating: Optional[int] = Field(default=0, description="Promedio de reseñas (0-5)", ge=0, le=5)
+    status: Status = Field(default=Status.OPEN, description="Estado del restaurante: open, closed o suspended")
+    rating: Optional[int] = Field(default=0, description="Promedio de reseñas (0-5)", ge=1, le=5)
 
     @validator('name', 'owner_id', 'phone_number', 'opening_hours')
     def validate_non_empty_fields(cls, v):

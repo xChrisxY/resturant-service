@@ -7,7 +7,7 @@ class AddressResponseDTO(BaseModel):
     street: str
     city: str
     state: str
-    country: Optional[str] = None
+    country: Optional[str] = "Mexico"
     postal_code: Optional[str] = None
     additional_info: Optional[str] = None
 

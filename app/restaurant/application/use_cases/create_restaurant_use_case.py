@@ -1,7 +1,13 @@
 from ...domain.entities.restaurant import Restaurant 
 from ...domain.repositories.restaurant_repository import RestaurantRepository
 from ..dto.create_restaurant_dto import CreateRestaurantDTO, CreateMenuItemDTO, CreateAddressDTO
+from ...domain.entities.menu import Menu 
+from ...domain.entities.address import Address
 from ....shared.exceptions import BusinessException
+import traceback
+import logging
+
+logger = logging.getLogger(__name__)
 
 class CreateRestaurantUseCase: 
     def __init__(self, restaurant_repository: RestaurantRepository):
@@ -24,13 +30,14 @@ class CreateRestaurantUseCase:
                 street=restaurant_dto.address.street, 
                 city=restaurant_dto.address.city, 
                 state=restaurant_dto.address.state, 
+                country=restaurant_dto.address.country,
                 postal_code=restaurant_dto.address.postal_code, 
                 additional_info=restaurant_dto.address.additional_info
             )
 
             restaurant = CreateRestaurantDTO(
                 name=restaurant_dto.name, 
-                description=restaurant_dto.address, 
+                description=restaurant_dto.description, 
                 owner_id=restaurant_dto.owner_id, 
                 address=restaurant_address, 
                 phone_number=restaurant_dto.phone_number, 
@@ -42,9 +49,15 @@ class CreateRestaurantUseCase:
             )
 
             created_restaurant = await self.restaurant_repository.create(restaurant)
-            
+
+            return created_restaurant
+    
+        except BusinessException:
+            # Re-raise BusinessException tal como están
+            raise
         except Exception as e: 
-            raise BusinessException(f"Failed to create order: {str(e)}")
-    
-    
+            logger.error(f"Error inesperado: {e}")
+            logger.error(f"Tipo de error: {type(e).__name__}")
+            logger.error(f"Traceback completo: {traceback.format_exc()}")
+            raise BusinessException(f"Error inesperado creando restaurant: {type(e).__name__}: {str(e)}")
     
