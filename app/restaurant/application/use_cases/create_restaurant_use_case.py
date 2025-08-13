@@ -4,10 +4,6 @@ from ..dto.create_restaurant_dto import CreateRestaurantDTO, CreateMenuItemDTO, 
 from ...domain.entities.menu import Menu 
 from ...domain.entities.address import Address
 from ....shared.exceptions import BusinessException
-import traceback
-import logging
-
-logger = logging.getLogger(__name__)
 
 class CreateRestaurantUseCase: 
     def __init__(self, restaurant_repository: RestaurantRepository):
@@ -53,11 +49,7 @@ class CreateRestaurantUseCase:
             return created_restaurant
     
         except BusinessException:
-            # Re-raise BusinessException tal como están
             raise
         except Exception as e: 
-            logger.error(f"Error inesperado: {e}")
-            logger.error(f"Tipo de error: {type(e).__name__}")
-            logger.error(f"Traceback completo: {traceback.format_exc()}")
             raise BusinessException(f"Error inesperado creando restaurant: {type(e).__name__}: {str(e)}")
     

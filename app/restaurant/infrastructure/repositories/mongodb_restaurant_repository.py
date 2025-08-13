@@ -2,6 +2,9 @@ from motor.motor_asyncio import AsyncIOMotorDatabase
 from ...domain.entities.restaurant import Restaurant
 from ...domain.repositories.restaurant_repository import RestaurantRepository
 
+from typing import Optional
+from bson import ObjectId
+
 class MongoDBRestaurantRepository(RestaurantRepository):
     
     def __init__(self, database: AsyncIOMotorDatabase):
@@ -21,9 +24,23 @@ class MongoDBRestaurantRepository(RestaurantRepository):
             
         return Restaurant(**created_restaurant)
     
-    async def get_by_id(self, restaurant_id):
-        return await super().get_by_id(restaurant_id)
+    async def get_by_id(self, restaurant_id: str) -> Optional[Restaurant]:
 
+        try: 
+            object_id = ObjectId(restaurant_id)
+            restaurant_doc = await self.collection.find_one({"_id": object_id})
+
+            if restaurant_doc:
+                # Convertir ObjectId to string for Pydantic model
+                restaurant_doc["_id"] = str(restaurant_doc["_id"])
+                return Restaurant(**restaurant_doc)
+            
+            return None
+            
+        except Exception:
+            return None
+        
+        
     async def get_by_status(self, status):
         return await super().get_by_status(status)
 
@@ -34,4 +51,16 @@ class MongoDBRestaurantRepository(RestaurantRepository):
         return await super().update(restaurant)
 
     async def delete(self, restaurant_id):
-        return await super().delete(restaurant_id)
+
+        try:
+            
+            object_id = ObjectId(restaurant_id)
+            
+            result = await self.collection.delete_one({
+                "_id" : object_id
+            })
+
+            return result.delete_count > 0
+
+        except Exception as e:
+            return False
